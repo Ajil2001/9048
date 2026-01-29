@@ -1,0 +1,945 @@
+/* --- Google Drive Modal & Genie Effect --- */
+
+/* The Modal Overlay - Covers the device screen */
+.drive-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2147483647 !important;
+    /* MAX Z-INDEX to cover taskbar */
+    /* Above everything */
+    pointer-events: none;
+    /* Pass through when hidden */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Container defining the "Window" that expands */
+.drive-modal-container {
+    position: absolute;
+    /* PC / Default Size - Landscape "Orange Rectangle" Look */
+    width: 85%;
+    max-width: 4000px;
+    /* Increased max-width */
+    height: 88%;
+    /* Increased from 85% */
+    max-height: 95vh;
+    /* Increased from 800px to allow full screen scaling */
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    background: #111;
+    border: 1px solid var(--primary-green);
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+
+    padding: 15px;
+    opacity: 0;
+    transform: scale(0);
+    /* Start hidden/small */
+    transform-origin: center center;
+    /* Default, will be overridden by JS */
+    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    /* Genie-ish ease */
+    pointer-events: auto;
+}
+
+/* Global Reset (Box Sizing) */
+.drive-modal-container * {
+    box-sizing: border-box;
+}
+
+/* Specific Override for Contact Modal to force Mobile Layout */
+#contactModal .drive-modal-container {
+    max-width: 450px;
+    /* Inherits green border/shadow from generic class */
+}
+
+#contactModal .drive-content-wrapper {
+    border: none;
+    margin-top: 30px;
+    /* Space for close button */
+    margin-bottom: 0;
+    border-radius: 4px;
+    background: #fff;
+    /* Ensure iframe background is solid if transparent */
+}
+
+#contactModal .close-drive-btn {
+    /* Reset keyframe/position if needed, but standard is fine */
+    top: 5px;
+    right: 5px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .drive-modal-container {
+        /* Updated Dimensions for Desktop/General */
+        width: 55%;
+        height: 85vh !important;
+        /* Increased from 70% */
+        max-height: 85vh !important;
+    }
+}
+
+
+/* Active State for Modal */
+.drive-modal-overlay.active .drive-modal-container {
+    opacity: 1;
+    transform: scale(1);
+    border-radius: 4px;
+    /* Slight rounded corners */
+}
+
+/* Close Button - Top Right */
+/* Close Button - Top Right - RELY ON FLEX PARENT */
+.close-drive-btn {
+    /* Removed absolute positioning to fix alignment */
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-family: 'Arimo', sans-serif;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-drive-btn:hover {
+    color: var(--primary-green);
+}
+
+/* The White Border Content Area */
+.drive-content-wrapper {
+    flex-grow: 1;
+    border: 2px solid #fff;
+    border-radius: 4px;
+    /* "White Border which I done for example" */
+    margin-top: 30px;
+    /* Space for close button */
+    margin-bottom: 0;
+    background: #000;
+    /* Inner black */
+    position: relative;
+    overflow-y: auto;
+    /* Auto scrollbar only when needed */
+    -webkit-overflow-scrolling: touch;
+}
+
+/* The Iframe */
+.drive-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+/* Logo at Bottom */
+.drive-modal-logo {
+    height: 30px;
+    display: flex;
+    justify-content: flex-start;
+    /* Left aligned as per reference usually? Or centered? Reference says "Logo needed". sticking to left/bottom-left or just generic block. */
+    align-items: center;
+    border: 1px solid #fff;
+    /* "Logo needed... in ref" often implies a box */
+    width: fit-content;
+    padding: 0 10px;
+    margin-bottom: 5px;
+}
+
+.drive-modal-logo img {
+    height: 20px;
+    width: auto;
+    filter: brightness(0) invert(1);
+    /* Ensure white logo */
+}
+
+
+/* --- Blur Effect for Background --- */
+/* We apply this to a class we toggle on the main content wrapper */
+.blur-active {
+    filter: blur(5px);
+    transition: filter 0.5s ease;
+}
+
+/* Ensure controls don't peek through */
+.device-frame.blur-mode .content-area,
+.device-frame.blur-mode .top-bar,
+.device-frame.blur-mode .centered-audio-player,
+.device-frame.blur-mode .side-controls,
+.device-frame.blur-mode .mb,
+.device-frame.blur-mode .bottom-bar,
+.device-frame.blur-mode .copyright-footer {
+    filter: blur(8px);
+    transition: filter 0.5s ease;
+}
+
+/* --- Window Controls MOVED TO STYLE.CSS --- */
+
+/* --- Taskbar (Footer Integration) --- */
+/* Styles moved to style.css to avoid duplication */
+
+/* Genie Effect Keyframes */
+@keyframes genie-minimize {
+    0% {
+        opacity: 1;
+        transform: scale(1) translate(0, 0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.1) translate(-45vw, 45vh);
+        /* Approximate bottom-left */
+    }
+}
+
+.genie-anim {
+    animation: genie-minimize 0.4s ease-in forwards;
+}
+
+/* Left Dissolve Moved to style.css */
+
+/* =========================================
+   BLOG DETAIL COMPLETE STYLES
+   (Strict, Consolidated, No Duplicates)
+   ========================================= */
+
+/* 1. HERO SECTION */
+.blog-detail-hero {
+    width: 100%;
+    /* Strict User Rules + Height Fix */
+    min-height: 90vh;
+    padding-top: 10px;
+    /* Removed large padding-bottom as overlay is now absolute */
+    padding-bottom: 40px;
+
+    background-color: #111;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #FFFFFF;
+
+    /* Animation: bgup 20s infinite alternate (Looping Pan) */
+    animation: bgup 20s ease-in-out infinite alternate;
+
+    position: relative;
+    margin-bottom: 40px;
+    border-bottom: 2px solid var(--primary-green);
+    /* Flex removed as we rely on absolute positioning for the child now */
+    display: block;
+}
+
+@keyframes bgup {
+    0% {
+        background-position: center top;
+    }
+
+    100% {
+        background-position: center bottom;
+    }
+}
+
+.blog-hero-overlay {
+    /* STRICTLY AT BOTTOM */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+
+    width: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 10%, rgba(0, 0, 0, 0.6) 50%, transparent 100%);
+    padding: 60px 20px 40px 20px;
+    /* Internal padding for text */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    opacity: 0;
+    animation: fadeInOverlay 1s ease-out 0.5s forwards;
+}
+
+@keyframes fadeInOverlay {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Typography */
+.blog-category-tag {
+    color: var(--primary-green);
+    border: 1px solid var(--primary-green);
+    background: rgba(0, 0, 0, 0.6);
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    display: inline-block;
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.blog-detail-title {
+    font-size: 3rem;
+    color: #fff;
+    margin-bottom: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    line-height: 1.1;
+    max-width: 1000px;
+}
+
+.blog-detail-subtitle {
+    font-size: 1.2rem;
+    color: #ddd;
+    font-style: italic;
+    margin-top: 10px;
+    max-width: 800px;
+}
+
+.blog-detail-date {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 20px;
+    font-family: monospace;
+}
+
+/* 2. MAIN CONTENT & SECTIONS */
+.blog-detail-content {
+    /* Strict Section Padding */
+    padding-top: 80px;
+    padding-bottom: 80px;
+
+    max-width: 1300px;
+    margin: 0 auto;
+    padding-left: 40px;
+    padding-right: 40px;
+
+    color: #ddd;
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+/* 3. LAYOUT (Flex Rules) */
+.blog-row {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: auto;
+    gap: 30px;
+    /* Consistent spacing */
+    align-items: center;
+}
+
+.blog-row.reverse {
+    flex-direction: row-reverse;
+}
+
+.blog-col {
+    flex: 1 1 250px;
+    /* User Strict: Basis 250px */
+    padding: 15px;
+    margin: 10px;
+}
+
+/* 4. IMAGES */
+.img-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 5px;
+    /* Reduced to bring caption closer */
+
+    /* Strict Clipping: Border is on this wrapper, Image zooms inside */
+    overflow: hidden;
+    border-radius: 4px;
+
+    /* BORDER MOVED HERE (Outside) */
+    border: 2px solid #333;
+    transition: border-color 0.3s ease;
+}
+
+.img-wrapper:hover {
+    border-color: var(--primary-green);
+}
+
+.blog-content-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: none;
+    /* No border on the image itself */
+    transition: transform 0.4s ease;
+}
+
+@media (hover: hover) {
+    .img-wrapper:hover .blog-content-img {
+        transform: scale(1.05);
+        /* Increased zoom slightly for visibility */
+    }
+}
+
+@media (hover: none) {
+    .img-wrapper:hover .blog-content-img {
+        transform: none !important;
+    }
+}
+
+.blog-caption {
+    display: block;
+    margin-top: 5px;
+    /* Reduced separation */
+    margin-bottom: 25px;
+    /* Push next content away */
+    /* Increased separation */
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: #888;
+    /* Slightly lighter for contrast */
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* 5. TEXT & GRID */
+.blog-intro-text {
+    max-width: 900px;
+    margin: 0 auto 60px auto;
+    text-align: center;
+    font-size: 1.25rem;
+    color: #fff;
+}
+
+.blog-text-section {
+    max-width: 900px;
+    margin: 80px auto;
+    text-align: left;
+}
+
+.blog-text-section h3 {
+    font-size: 2rem;
+    color: #fff;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    border-left: 4px solid var(--primary-green);
+    padding-left: 20px;
+}
+
+.blog-text-section h4 {
+    font-size: 1.4rem;
+    color: #aaa;
+    margin-bottom: 30px;
+    font-weight: 300;
+    padding-left: 24px;
+}
+
+.blog-col h3 {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--primary-green);
+    display: inline-block;
+}
+
+.img-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto auto;
+    gap: 20px;
+    width: 100%;
+    margin: 40px auto;
+    max-width: 1000px;
+}
+
+.img-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 6. CONCLUSION */
+.blog-conclusion {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 60px;
+    text-align: center;
+    max-width: 800px;
+    margin: 100px auto 40px auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.blog-conclusion::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--primary-green);
+}
+
+.blog-conclusion h3 {
+    font-size: 1.8rem;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.blog-conclusion p {
+    font-size: 1.1rem;
+    color: #bbb;
+}
+
+/* 7. NAVIGATION & BUTTONS */
+.blog-nav-footer {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #333;
+    padding-top: 40px;
+    margin-top: 40px;
+}
+
+.nav-article-btn {
+    background: transparent;
+    border: 1px solid var(--primary-green);
+    color: var(--primary-green);
+    /* Icon Only Style - Merged Definition */
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.nav-article-btn:hover {
+    background: var(--primary-green);
+    color: #000;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+}
+
+.nav-article-btn.disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+    border-color: #555;
+    color: #555;
+    box-shadow: none;
+}
+
+.nav-top-btn {
+    position: fixed;
+    /* Fixed relative to viewport for correct float */
+    bottom: 190px;
+    right: 60px;
+    /* Brought in slightly */
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    border: 1px solid var(--primary-green);
+    color: var(--primary-green);
+    width: 26px;
+    /* Reduced from 45px */
+    height: 26px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1rem;
+    z-index: 1000;
+    /* Increased Z-index */
+
+    /* Animation / State */
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.nav-top-btn svg {
+    width: 18px;
+    /* Reduced Icon Size */
+    height: 18px;
+}
+
+
+
+.nav-top-btn.visible {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+}
+
+.nav-top-btn:hover {
+    background: var(--primary-green);
+    color: #000;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+}
+
+/* Ensure container allows absolute positioning */
+.drive-modal-container {
+    position: relative;
+    /* Should already be this, but confirming relationship */
+}
+
+/* 8. LISTS (Hanging Indent) & RICH TEXT */
+.blog-detail-content ul,
+.blog-detail-content ol {
+    margin-left: 0;
+    padding-left: 10px;
+    margin-bottom: 20px;
+    color: #ddd;
+    list-style: none;
+    /* Hide default */
+}
+
+.blog-detail-content ul li {
+    position: relative;
+    padding-left: 35px;
+    /* Hanging indent gap */
+    margin-bottom: 12px;
+    line-height: 1.6;
+}
+
+.blog-detail-content ul li::before {
+    content: "•";
+    position: absolute;
+    left: 10px;
+    top: -1px;
+    color: #fff;
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.blog-detail-content ol {
+    counter-reset: blog-counter;
+}
+
+.blog-detail-content ol li {
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+}
+
+.blog-detail-content ol li::before {
+    counter-increment: blog-counter;
+    content: counter(blog-counter) ".";
+    position: absolute;
+    left: 5px;
+    color: var(--primary-green);
+    font-weight: bold;
+}
+
+/* Rich Text */
+.blog-detail-content mark {
+    background-color: var(--primary-green);
+    color: #000;
+    padding: 0 4px;
+    font-weight: bold;
+}
+
+.blog-detail-content u {
+    text-decoration: underline;
+    text-decoration-color: var(--primary-green);
+    text-underline-offset: 4px;
+}
+
+.blog-detail-content b,
+.blog-detail-content strong {
+    font-weight: bold;
+    color: #fff;
+}
+
+.blog-detail-content i,
+.blog-detail-content em {
+    font-style: italic;
+    color: #aaa;
+}
+
+.blog-detail-content sub {
+    vertical-align: sub;
+    font-size: smaller;
+    color: #888;
+}
+
+.blog-detail-content sup {
+    vertical-align: super;
+    font-size: smaller;
+    color: #888;
+}
+
+/* 9. RESPONSIVE REFINEMENTS (Sized Tweaks) */
+
+/* TABLET (max-width: 1024px) */
+@media (max-width: 1024px) {
+
+    /* 1. Typography Scaling (Tablet) */
+    .blog-detail-title {
+        font-size: 2.2rem;
+    }
+
+    .blog-detail-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .blog-intro-text {
+        font-size: 1.1rem;
+    }
+
+    .blog-text-section h3 {
+        font-size: 1.6rem;
+    }
+
+    .blog-conclusion h3 {
+        font-size: 1.6rem;
+    }
+
+    /* 2. Layout & Spacing */
+    .blog-row,
+    .blog-row.reverse {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 40px;
+    }
+
+    .blog-col {
+        width: 100%;
+        padding: 0;
+    }
+
+    .blog-col p,
+    .blog-text-section p {
+        text-align: left;
+    }
+
+    /* 3. Buttons (Tablet) */
+    .nav-article-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 1rem;
+    }
+}
+
+/* MOBILE (max-width: 768px) - OVERLAY SCROLL FIX */
+@media (max-width: 768px) {
+
+    /* SCROLL STRATEGY: Revert to internal scroll (User Request) */
+    .drive-modal-overlay {
+        display: flex;
+        /* Center it */
+        overflow: hidden;
+        /* No overlay scroll */
+        padding: 0;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .drive-modal-container {
+        position: relative;
+        /* Adjusted for Work/Contact: Fixed usable height (70vh) to avoid squeezing */
+        height: 55vh !important;
+        max-height: 85vh !important;
+        width: 96%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* BLOG SPECIFIC: Needs fixed tall height for internal scrolling */
+    #blogModalContainer {
+        height: 85vh !important;
+        max-height: 85vh !important;
+    }
+
+    .drive-modal-overlay.active .drive-modal-container {
+        transform: none !important;
+        opacity: 1 !important;
+    }
+
+    /* Generic reset first */
+    .drive-content-wrapper {
+        overflow-y: auto !important;
+        height: auto !important;
+        flex: 1;
+        /* Fill remaining height */
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* IFRAME MODALS ONLY (Contact / Drive) */
+    #contactModal .drive-content-wrapper,
+    #driveModal .drive-content-wrapper {
+        height: auto !important;
+        flex: 1;
+        /* Grow to fill container */
+        overflow-y: auto !important;
+        /* Wrapper scroll enabled */
+        min-height: 0;
+        /* Allow shrinking */
+    }
+
+    .drive-iframe {
+        height: 100% !important;
+        width: 100% !important;
+        border: none;
+    }
+
+    /* BLOG MODAL - Internal Scroll */
+    .blog-detail-wrapper {
+        overflow-y: auto !important;
+        /* SCROLL HERE */
+        height: auto !important;
+        flex: 1;
+        /* Grow to fill */
+        display: block !important;
+    }
+
+    /* 1. Typography Scaling (Mobile) */
+    .blog-detail-title {
+        font-size: 1.1rem;
+        /* Reduced from 1.4rem */
+        line-height: 1.2;
+    }
+
+    /* Smaller Hero Title */
+    .blog-detail-subtitle {
+        font-size: 0.75rem;
+    }
+
+    .blog-detail-date {
+        font-size: 0.6rem;
+    }
+
+    .blog-intro-text {
+        font-size: 0.85rem;
+        /* Slightly smaller */
+        padding: 0;
+        margin-bottom: 15px;
+        /* Reduced from 20px */
+    }
+
+    .blog-detail-content {
+        font-size: 0.85rem;
+        /* Reduced from 0.9rem */
+        line-height: 1.4;
+    }
+
+    /* Smaller Body Text */
+
+    .blog-text-section h3,
+    .blog-col h3 {
+        font-size: 1.2rem;
+        /* Reduced from 1.4rem */
+        padding-left: 10px;
+        border-left-width: 3px;
+        margin-bottom: 10px;
+    }
+
+    .blog-conclusion h3 {
+        font-size: 1.1rem;
+        letter-spacing: 1px;
+    }
+
+    /* 2. Button Sizing (Mobile) */
+    .nav-article-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 0.8rem;
+        /* Smaller Icons */
+        border-width: 1px;
+    }
+
+    .blog-nav-footer {
+        padding-top: 20px;
+        margin-top: 20px;
+        /* Reduced from 30px */
+    }
+
+    /* 3. Layout & Spacing */
+    .blog-detail-hero {
+        height: 35vh !important;
+        /* Reduced height from 50vh */
+        min-height: 250px;
+    }
+
+    .img-grid-4 {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin: 20px auto;
+        /* Reduced from 40px */
+    }
+
+    /* Strict Mobile Padding for Content */
+    .blog-detail-content {
+        padding: 0 15px 120px 15px;
+        /* Added 120px BOTTOM PADDING to clear Taskbar */
+        padding-top: 10px;
+        /* Reduce top padding significantly */
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .blog-hero-overlay {
+        padding: 20px 15px;
+    }
+
+    /* Compact overlay */
+
+    .blog-text-section,
+    .blog-row {
+        margin: 20px 0;
+        /* Reduced from 40px */
+    }
+
+    /* Reduce vertical gaps */
+
+    /* CONCLUSION FIX: Reduce massive padding */
+    .blog-conclusion {
+        padding: 20px 15px;
+        /* Reduced from 30px */
+        width: 100%;
+        margin: 20px 0;
+        /* Reduced from 30px */
+        box-sizing: border-box;
+    }
+
+    .taskbar-group {
+        position: fixed;
+        bottom: 15px;
+        /* Slightly lower */
+        left: 15px;
+        z-index: 999;
+    }
+}
+
+/* 10. SMOOTH NAVIGATION TRANSITION */
+.content-fade-out {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Ensure the wrapper has a transition property by default for the fade-in */
+.blog-detail-wrapper {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 1;
+    transform: translateY(0);
+    /* Ensure it starts visible */
+}
