@@ -68,7 +68,7 @@ function showInstallPopup(isIOS = false, deviceType = '') {
 
     // Inner HTML Structure
     const defaultHTML = `
-        <button id="pwaCloseBtn" style="position:absolute; top:10px; right:10px; background:transparent; border:none; color:#fff; font-size:25px; cursor:pointer; line-height:1;">&times;</button>
+        <button id="pwaCloseBtn" style="position:absolute; top:12px; right:20px; background:transparent; border:none; color:#fff; font-size:25px; cursor:pointer; line-height:1;">&times;</button>
         <h3 style="color:#00ff00; margin-top:0; letter-spacing:1px;">INSTALL APPLICATION</h3><br>
         <p style="color:#fff; font-size:15px; line-height:1.5;">
             Install this application on your home screen for quick access and better performance.
@@ -192,3 +192,4 @@ function checkApplePlatform() {
 }
 
 window.addEventListener('load', checkApplePlatform);
+
